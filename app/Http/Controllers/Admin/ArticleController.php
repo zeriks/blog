@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Article;
 use App\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-class CategoryController extends Controller
+class ArticleController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,8 +16,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return view('admin.categories.index', [
-            'categories'=> Category::paginate(10)
+        return view('admin.articles.index', [
+            'articles' => Article::orderBy('created_at', 'desc')->paginate(10)
         ]);
     }
 
@@ -27,8 +28,8 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return view('admin.categories.create', [
-            'category' => [],
+        return view('admin.article.create', [
+            'article' => [],
             'categories' => Category::with('children')->where('parent_id', 0)->get(),
             'delimiter' => ''
         ]);
@@ -42,17 +43,22 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        Category::create($request->all());
-        return redirect()->route('admin.category.index');
+        $article = Article::create($request->all());
+
+        //categories
+        if($request->input('categories')){
+            $article->categories()->attach($request->input('categories'));
+        }
+        return redirect()->route('admin.article.index');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Category  $category
+     * @param  \App\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function show(Category $category)
+    public function show(Article $article)
     {
         //
     }
@@ -60,40 +66,34 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Category  $category
+     * @param  \App\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function edit(Category $category)
+    public function edit(Article $article)
     {
-        return view('admin.categories.edit',[
-            'category' => $category,
-            'categories' => Category::with('children')->where('parent_id', 0)->get(),
-            'delimiter' => ''
-        ]);
+        //
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Category  $category
+     * @param  \App\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, Article $article)
     {
-        $category->update($request->except('slug'));
-        return redirect()->route('admin.category.index');
+        //
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Category  $category
+     * @param  \App\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Category $category)
+    public function destroy(Article $article)
     {
-        $category->delete();
-        return redirect()->route('admin.category.index');
+        //
     }
 }
